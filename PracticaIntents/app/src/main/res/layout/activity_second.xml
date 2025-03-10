@@ -15,7 +15,6 @@
         android:layout_marginTop="28dp"
         android:ems="10"
         android:hint="@string/enter_name"
-        android:inputType="text"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -26,10 +25,10 @@
         android:id="@+id/btnGoToThirdActivity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:text="@string/enter_system"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtName" />
 </androidx.constraintlayout.widget.ConstraintLayout>
