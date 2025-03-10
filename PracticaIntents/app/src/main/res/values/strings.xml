@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PracticaIntents</string>
+    <string name="welcome_text">Bienvenido %1$s</string>
+    <string name="enter_system">Ingresar al sistema</string>
+    <string name="enter_name">Ingrese su nombre</string>
+    <string name="call_activity">Llamar a segundo activity</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PruebaApp</string>
+    <string name="mostrar_toast">Mostrar Toast</string>
+    <string name="bienvenido_text">Bienvenido a la primera app</string>
+    <string name="hola_mundo">Hola Mundo</string>
+</resources>
