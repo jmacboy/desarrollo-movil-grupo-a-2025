@@ -1,6 +1,8 @@
 package com.example.practicarecyclerview.models
 
-class Person() {
+import java.io.Serializable
+
+class Person() : Serializable {
     var id: Int = 0
     var name: String = ""
     var lastName: String = ""
@@ -22,5 +24,9 @@ class Person() {
         this.age = age
         this.phone = phone
         this.email = email
+    }
+
+    override fun toString(): String {
+        return "Person(id=$id, name='$name', lastName='$lastName', age=$age, phone='$phone', email='$email')"
     }
 }

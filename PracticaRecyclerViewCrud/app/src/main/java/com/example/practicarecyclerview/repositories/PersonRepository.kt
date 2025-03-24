@@ -28,26 +28,28 @@ object PersonRepository {
         return personList.find { it.id == id }
     }
 
-    fun savePerson(person: Person) {
+    fun savePerson(person: Person): Int {
         if (person.id == 0) {
-            insertPerson(person)
+            return insertPerson(person)
         } else {
-            updatePerson(person)
+            return updatePerson(person)
         }
     }
 
-    private fun updatePerson(person: Person) {
+    private fun updatePerson(person: Person): Int {
         val position = personList.indexOfFirst { it.id == person.id }
         if (position == -1) {
-            return
+            return 0
         }
         personList[position] = person
+        return person.id
     }
 
-    private fun insertPerson(person: Person) {
+    private fun insertPerson(person: Person): Int {
         val lastId = personList.maxOfOrNull { it.id } ?: 0
         person.id = lastId + 1
         personList.add(person)
+        return lastId + 1
     }
 
     fun deletePerson(person: Person): Int {

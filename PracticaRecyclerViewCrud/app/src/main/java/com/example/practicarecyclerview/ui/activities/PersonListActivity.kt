@@ -1,5 +1,8 @@
 package com.example.practicarecyclerview.ui.activities
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -28,17 +31,29 @@ class PersonListActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListe
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             result.data?.let {
                 it.extras?.let { extras ->
-                    val sentId = extras.getInt("sentId")
-                    if (sentId > 0) {
-                        dataUpdatedWithId(sentId)
-                    }
+                    val personChanged =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            extras.getSerializable(PARAM_UPDATED_OBJECT, Person::class.java)
+                        } else {
+                            extras.getSerializable(PARAM_UPDATED_OBJECT) as Person
+                        }
+
+                    val inserted = extras.getBoolean(PARAM_INSERTED)
+                    Log.d("RESULT", "Person changed: $personChanged")
+                    Log.d("RESULT", "Person inserted: $inserted")
+                    viewModel.updateItem(inserted, personChanged)
                 }
             }
         }
 
-    private fun dataUpdatedWithId(sentId: Int) {
+    private fun dataInsertedWithId(personInserted: Person?) {
         val adapter = binding.lstPersons.adapter as PersonAdapter
-        adapter.updateById(sentId)
+        adapter.addItem(personInserted)
+    }
+
+    private fun dataUpdatedWithId(personChanged: Person?) {
+        val adapter = binding.lstPersons.adapter as PersonAdapter
+        adapter.updateItem(personChanged)
     }
 
 
@@ -55,19 +70,17 @@ class PersonListActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListe
         setupRecyclerView()
         setupViewModelObservers()
         setupEventListeners()
+        viewModel.loadData()
+
     }
 
     private fun setupEventListeners() {
         binding.fabCreatePerson.setOnClickListener {
             val intent = PersonDetailActivity.createIntent(this)
-            startActivity(intent)
+            startForResult.launch(intent)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadData()
-    }
 
     private fun setupViewModelObservers() {
         viewModel.personList.observe(this) {
@@ -80,6 +93,17 @@ class PersonListActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListe
             binding.lstPersons.visibility = View.VISIBLE
             val adapter = binding.lstPersons.adapter as PersonAdapter
             adapter.setData(it)
+        }
+        viewModel.personChanged.observe(this) {
+            if (it == null) {
+                return@observe
+            }
+
+            if (viewModel.inserted.value == true) {
+                dataInsertedWithId(it)
+            } else {
+                dataUpdatedWithId(it)
+            }
         }
 
     }
@@ -124,4 +148,14 @@ class PersonListActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListe
         }
     }
 
+    companion object {
+        private const val PARAM_INSERTED = "inserted"
+        private const val PARAM_UPDATED_OBJECT = "updatedPerson"
+        fun returnIntent(context: Context, inserted: Boolean, person: Person): Intent {
+            return Intent(context, PersonListActivity::class.java).apply {
+                putExtra(PARAM_INSERTED, inserted)
+                putExtra(PARAM_UPDATED_OBJECT, person)
+            }
+        }
+    }
 }

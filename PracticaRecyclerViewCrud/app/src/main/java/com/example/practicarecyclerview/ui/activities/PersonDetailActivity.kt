@@ -3,6 +3,7 @@ package com.example.practicarecyclerview.ui.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -44,6 +45,7 @@ class PersonDetailActivity : AppCompatActivity() {
 
     private fun doSave() {
         val person = viewModel.person.value ?: Person()
+
         person.apply {
             age = binding.txtAge.text.toString().toInt()
             name = binding.txtName.text.toString()
@@ -51,11 +53,13 @@ class PersonDetailActivity : AppCompatActivity() {
             email = binding.txtEmail.text.toString()
             lastName = binding.txtLastName.text.toString()
         }
-        val saved = viewModel.savePerson(person)
-        if (saved) {
-            val resultIntent = Intent()
-            resultIntent.putExtra("sentId", id)
-            setResult(1, resultIntent)
+        val savedId = viewModel.savePerson(person)
+        if (savedId != -1) {
+            val isInsert = id == 0
+            person.id = savedId
+            Log.d("RESULT", "Is insert sending $isInsert")
+            val resultIntent = PersonListActivity.returnIntent(this, isInsert, person)
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
     }

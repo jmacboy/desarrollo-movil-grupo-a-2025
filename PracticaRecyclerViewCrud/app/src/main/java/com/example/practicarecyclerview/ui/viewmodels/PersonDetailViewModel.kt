@@ -16,14 +16,14 @@ class PersonDetailViewModel : ViewModel() {
         _person.value = PersonRepository.getPersonById(id)
     }
 
-    fun savePerson(person: Person): Boolean {
+    fun savePerson(person: Person): Int {
         try {
-            PersonRepository.savePerson(person)
-            return true
+            val id = PersonRepository.savePerson(person)
+            return id
         } catch (e: Exception) {
             e.printStackTrace()
             _hasErrorSaving.value = true
-            return false
+            return -1
         }
     }
 }
