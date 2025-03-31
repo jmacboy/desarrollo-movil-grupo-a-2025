@@ -1,5 +1,6 @@
 package com.example.practicaroom.ui.activities
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -7,15 +8,22 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.practicaroom.R
 import com.example.practicaroom.databinding.ActivityPersonDetailBinding
 import com.example.practicaroom.db.models.Person
+import com.example.practicaroom.db.models.Phone
+import com.example.practicaroom.ui.adapters.PhoneAdapter
 import com.example.practicaroom.ui.viewmodels.PersonDetailViewModel
 
-class PersonDetailActivity : AppCompatActivity() {
+
+class PersonDetailActivity : AppCompatActivity(), PhoneAdapter.OnPhoneClickListener {
     private var id: Int = 0
     private lateinit var binding: ActivityPersonDetailBinding
     private val viewModel: PersonDetailViewModel by viewModels()
@@ -31,16 +39,41 @@ class PersonDetailActivity : AppCompatActivity() {
         }
         setupViewModelObservers()
         setupEventListeners()
+        setupPhoneRecyclerView()
+
         id = intent.getIntExtra(PARAM_ID, 0)
         if (id == 0) {
             return
         }
+
         viewModel.loadPerson(this, id)
+    }
+
+    private fun setupPhoneRecyclerView() {
+        val adapter = PhoneAdapter(mutableListOf())
+        val dividerItemDecoration = DividerItemDecoration(
+            binding.rvPhones.context,
+            LinearLayoutManager.VERTICAL
+        )
+        binding.rvPhones.apply {
+            this.adapter = adapter
+            layoutManager = LinearLayoutManager(this@PersonDetailActivity).apply {
+                orientation = LinearLayoutManager.VERTICAL
+            }
+            addItemDecoration(dividerItemDecoration)
+        }
+        adapter.setOnPhoneClickListener(this)
     }
 
     private fun setupEventListeners() {
         binding.btnDetailSave.setOnClickListener { doSave() }
         binding.btnDetailCancel.setOnClickListener { finish() }
+        binding.btnPhoneAdd.setOnClickListener { showPhoneDialog() }
+    }
+
+    private fun showPhoneDialog() {
+        val dialogFragment = PhoneDialogFragment()
+        dialogFragment.show(supportFragmentManager, "PhoneDialog")
     }
 
     private fun doSave() {
@@ -49,12 +82,10 @@ class PersonDetailActivity : AppCompatActivity() {
         person.apply {
             age = binding.txtAge.text.toString().toInt()
             name = binding.txtName.text.toString()
-            phone = binding.txtPhone.text.toString()
             email = binding.txtEmail.text.toString()
             lastName = binding.txtLastName.text.toString()
         }
         viewModel.savePerson(this, person)
-
     }
 
     private fun setupViewModelObservers() {
@@ -64,7 +95,6 @@ class PersonDetailActivity : AppCompatActivity() {
             }
             binding.txtAge.setText(it.age.toString())
             binding.txtName.setText(it.name)
-            binding.txtPhone.setText(it.phone)
             binding.txtEmail.setText(it.email)
             binding.txtLastName.setText(it.lastName)
         }
@@ -97,5 +127,41 @@ class PersonDetailActivity : AppCompatActivity() {
         }
 
         private const val PARAM_ID = "id"
+    }
+
+    override fun onPhoneClick(phone: Phone) {
+
+    }
+
+    class PhoneDialogFragment(val viewModel: PersonDetailViewModel) : DialogFragment() {
+
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return activity?.let {
+                val builder = AlertDialog.Builder(it)
+                val inflater = it.layoutInflater
+                builder.setView(inflater.inflate(R.layout.phone_dialog_layout, null))
+                    // Add action buttons.
+                    .setPositiveButton(
+                        "OK"
+                    ) { dialog, id ->
+                        val dialog  = dialog as AlertDialog
+                        val txtPhoneNumber = dialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.txtPhoneNumber)
+                        val phoneNumber = txtPhoneNumber?.text.toString()
+
+                        val phoneTypeSpinner = dialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.spPhoneType)
+                        val phoneType = phoneTypeSpinner?.text.toString()
+                        viewModel.savePhone(phoneNumber, phoneType)
+
+
+                    }
+                    .setNegativeButton(
+                        "Cancel"
+                    ) { dialog, id ->
+                        getDialog()?.cancel()
+                    }
+                builder.create()
+            } ?: throw IllegalStateException("Activity cannot be null")
+        }
     }
 }

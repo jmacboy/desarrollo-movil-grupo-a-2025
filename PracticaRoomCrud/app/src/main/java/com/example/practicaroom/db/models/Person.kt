@@ -10,7 +10,6 @@ data class Person(
     var lastName: String,
     var age: Int,
     var email: String,
-    var phone: String,
     var birthDate: String
 ) : Serializable {
     @PrimaryKey(autoGenerate = true)
@@ -20,7 +19,6 @@ data class Person(
         "",
         "",
         0,
-        "",
         "",
         ""
     )

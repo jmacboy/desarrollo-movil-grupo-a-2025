@@ -2,6 +2,7 @@ package com.example.practicaroom.repositories
 
 import android.content.Context
 import com.example.practicaroom.db.models.Person
+import com.example.practicaroom.db.models.PersonWithPhones
 
 object PersonRepository {
     suspend fun getPersonList(context: Context): List<Person> {
@@ -19,6 +20,16 @@ object PersonRepository {
             .getRoomInstance(context)
             .personDao()
             .getById(id)
+    }
+
+    suspend fun getPersonWithPhones(context: Context, id: Int): PersonWithPhones {
+        if (id <= 0) {
+            throw IllegalArgumentException("Id must be greater than 0")
+        }
+        return RoomRepository
+            .getRoomInstance(context)
+            .personDao()
+            .getPersonWithPhones(id)
     }
 
     suspend fun insertPerson(context: Context, person: Person): Long {

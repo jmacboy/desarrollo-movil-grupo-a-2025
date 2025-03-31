@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.example.practicaroom.db.models.Person
+import com.example.practicaroom.db.models.PersonWithPhones
 
 @Dao
 interface PersonDao {
@@ -23,4 +24,7 @@ interface PersonDao {
 
     @Delete
     suspend fun deletePerson(person: Person): Int
+
+    @Query("SELECT * FROM Person WHERE id = :id")
+    suspend fun getPersonWithPhones(id: Int): PersonWithPhones
 }

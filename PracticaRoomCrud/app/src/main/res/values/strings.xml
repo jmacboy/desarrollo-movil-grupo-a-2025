@@ -2,5 +2,4 @@
     <string name="app_name">PracticaRoom</string>
     <string name="error_saving_person">Error guardando persona, intente nuevamente.</string>
     <string name="empty_list_text">No hay ningún elemento en la lista. \nPara agregar uno, presione el botón +</string>
-
 </resources>

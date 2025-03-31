@@ -6,12 +6,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.practicaroom.db.models.Person
+import com.example.practicaroom.db.models.Phone
 import com.example.practicaroom.repositories.PersonRepository
 import kotlinx.coroutines.launch
 
 class PersonDetailViewModel : ViewModel() {
     private val _person: MutableLiveData<Person> = MutableLiveData(null)
     val person: LiveData<Person> = _person
+
+    private val _phones: MutableLiveData<List<Phone>> = MutableLiveData(mutableListOf())
+    val phones: LiveData<List<Phone>> = _phones
 
     private val _hasErrorSaving: MutableLiveData<Boolean> = MutableLiveData(false)
     val hasErrorSaving: LiveData<Boolean> = _hasErrorSaving
@@ -21,7 +25,9 @@ class PersonDetailViewModel : ViewModel() {
 
     fun loadPerson(context: Context, id: Int) {
         viewModelScope.launch {
-            _person.postValue(PersonRepository.getPersonById(context, id))
+            val personWithPhones = PersonRepository.getPersonWithPhones(context, id)
+            _phones.postValue(personWithPhones.phones)
+            _person.postValue(personWithPhones.person)
         }
     }
 
@@ -36,5 +42,9 @@ class PersonDetailViewModel : ViewModel() {
                 _hasErrorSaving.postValue(true)
             }
         }
+    }
+
+    fun savePhone(phoneNumber: String, phoneType: String) {
+        
     }
 }

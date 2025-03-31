@@ -44,19 +44,6 @@
             app:layout_constraintTop_toBottomOf="@+id/txtName" />
 
         <EditText
-            android:id="@+id/txtPhone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:ems="10"
-            android:hint="Teléfono"
-            android:inputType="phone"
-            android:minHeight="48dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtLastName" />
-
-        <EditText
             android:id="@+id/txtEmail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -67,7 +54,7 @@
             android:minHeight="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtPhone" />
+            app:layout_constraintTop_toBottomOf="@+id/txtLastName" />
 
         <EditText
             android:id="@+id/txtAge"
@@ -101,5 +88,25 @@
             app:layout_constraintBottom_toTopOf="@+id/btnDetailCancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPhones"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="1dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnDetailSave"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnPhoneAdd"
+            tools:listitem="@layout/phone_item_view" />
+
+        <ImageButton
+            android:id="@+id/btnPhoneAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtAge"
+            app:srcCompat="@android:drawable/ic_menu_add" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

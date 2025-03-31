@@ -63,7 +63,7 @@ class PersonAdapter(
     class ViewHolder(private val binding: PersonItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Person, listener: OnPersonClickListener?) {
-            binding.lblPhone.text = item.phone
+            binding.lblPhone.text = "123456"//item.phone
             binding.lblFullName.text = "${item.name} ${item.lastName}"
             binding.root.setOnClickListener {
                 listener?.onPersonClick(item)
