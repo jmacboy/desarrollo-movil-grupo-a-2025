@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.practicaroom.R
 import com.example.practicaroom.databinding.ActivityMainBinding
 import com.example.practicaroom.db.models.Person
+import com.example.practicaroom.db.models.PersonWithPhones
 import com.example.practicaroom.ui.adapters.PersonAdapter
 import com.example.practicaroom.ui.viewmodels.MainViewModel
 
@@ -54,9 +54,9 @@ class MainActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListener {
     private fun activityResultCallback(extras: Bundle) {
         val personChanged =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                extras.getSerializable(PARAM_UPDATED_OBJECT, Person::class.java)
+                extras.getSerializable(PARAM_UPDATED_OBJECT, PersonWithPhones::class.java)
             } else {
-                extras.getSerializable(PARAM_UPDATED_OBJECT) as Person
+                extras.getSerializable(PARAM_UPDATED_OBJECT) as PersonWithPhones
             }
 
         val inserted = extras.getBoolean(PARAM_INSERTED)
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListener {
         }
     }
 
-    private fun dataInsertedWithId(personChanged: Person?) {
+    private fun dataInsertedWithId(personChanged: PersonWithPhones?) {
         val adapter = binding.lstPersons.adapter as PersonAdapter
         adapter.addItem(personChanged)
         if (adapter.itemCount > 0) {
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListener {
         }
     }
 
-    private fun dataUpdatedWithId(personChanged: Person?) {
+    private fun dataUpdatedWithId(personChanged: PersonWithPhones?) {
         val adapter = binding.lstPersons.adapter as PersonAdapter
         adapter.updateItem(personChanged)
     }
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListener {
             binding.lblEmptyText.visibility = View.GONE
             binding.lstPersons.visibility = View.VISIBLE
             val adapter = binding.lstPersons.adapter as PersonAdapter
-            adapter.setData(it as MutableList<Person>)
+            adapter.setData(it as MutableList<PersonWithPhones>)
         }
         viewModel.personDeleted.observe(this) {
             if (it == null) {
@@ -136,20 +136,20 @@ class MainActivity : AppCompatActivity(), PersonAdapter.OnPersonClickListener {
 
     }
 
-    override fun onPersonClick(person: Person) {
-        val id = person.id
+    override fun onPersonClick(personPhone: PersonWithPhones) {
+        val id = personPhone.person.id
         val intent = PersonDetailActivity.detailIntent(this, id)
         startForResult.launch(intent)
     }
 
-    override fun onPersonDeleteClick(person: Person) {
-        viewModel.deletePerson(this, person)
+    override fun onPersonDeleteClick(personPhone: PersonWithPhones) {
+        viewModel.deletePerson(this, personPhone)
     }
 
     companion object {
         private const val PARAM_INSERTED = "inserted"
         private const val PARAM_UPDATED_OBJECT = "updatedPerson"
-        fun returnIntent(context: Context, inserted: Boolean, person: Person): Intent {
+        fun returnIntent(inserted: Boolean, person: Person): Intent {
             return Intent().apply {
                 putExtra(PARAM_INSERTED, inserted)
                 putExtra(PARAM_UPDATED_OBJECT, person)

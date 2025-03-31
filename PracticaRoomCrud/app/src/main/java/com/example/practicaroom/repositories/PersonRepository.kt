@@ -5,7 +5,7 @@ import com.example.practicaroom.db.models.Person
 import com.example.practicaroom.db.models.PersonWithPhones
 
 object PersonRepository {
-    suspend fun getPersonList(context: Context): List<Person> {
+    suspend fun getPersonList(context: Context): List<PersonWithPhones> {
         return RoomRepository
             .getRoomInstance(context)
             .personDao()

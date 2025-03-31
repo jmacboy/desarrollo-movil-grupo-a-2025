@@ -1,6 +1,7 @@
 package com.example.practicaroom.ui.viewmodels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.practicaroom.db.models.Person
 import com.example.practicaroom.db.models.Phone
 import com.example.practicaroom.repositories.PersonRepository
+import com.example.practicaroom.repositories.PhoneRepository
 import kotlinx.coroutines.launch
 
 class PersonDetailViewModel : ViewModel() {
@@ -44,7 +46,27 @@ class PersonDetailViewModel : ViewModel() {
         }
     }
 
-    fun savePhone(phoneNumber: String, phoneType: String) {
-        
+    fun savePhone(context: Context, phoneNumber: String, phoneType: String) {
+        Log.d("PersonDetailViewModel", "Saving phone with number $phoneNumber and type $phoneType")
+        val phone = Phone(phoneNumber, phoneType, _person.value?.id ?: 0)
+        viewModelScope.launch {
+            try {
+                val id = PhoneRepository.savePhone(context, phone)
+                phone.id = id
+                _phones.postValue(_phones.value?.plus(phone))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _hasErrorSaving.postValue(true)
+            }
+        }
+    }
+
+    fun deletePhone(context: Context, phone: Phone) {
+        viewModelScope.launch {
+            PhoneRepository.deletePhone(context, phone)
+            _phones.postValue(
+                _phones.value?.filter { it.id != phone.id }
+            )
+        }
     }
 }

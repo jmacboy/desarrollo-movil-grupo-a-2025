@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -43,9 +46,10 @@ class PersonDetailActivity : AppCompatActivity(), PhoneAdapter.OnPhoneClickListe
 
         id = intent.getIntExtra(PARAM_ID, 0)
         if (id == 0) {
+            binding.phoneLayout.visibility = View.GONE
             return
         }
-
+        binding.phoneLayout.visibility = View.VISIBLE
         viewModel.loadPerson(this, id)
     }
 
@@ -72,7 +76,7 @@ class PersonDetailActivity : AppCompatActivity(), PhoneAdapter.OnPhoneClickListe
     }
 
     private fun showPhoneDialog() {
-        val dialogFragment = PhoneDialogFragment()
+        val dialogFragment = PhoneDialogFragment(viewModel)
         dialogFragment.show(supportFragmentManager, "PhoneDialog")
     }
 
@@ -108,10 +112,17 @@ class PersonDetailActivity : AppCompatActivity(), PhoneAdapter.OnPhoneClickListe
             if (it != null) {
                 val isInsert = id == 0
                 Log.d("RESULT", "Is insert sending $isInsert")
-                val resultIntent = MainActivity.returnIntent(this, isInsert, it)
+                val resultIntent = MainActivity.returnIntent(isInsert, it)
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
+        }
+        viewModel.phones.observe(this){
+            if (it == null) {
+                return@observe
+            }
+            val adapter = binding.rvPhones.adapter as PhoneAdapter
+            adapter.setData(it as MutableList<Phone>)
         }
     }
 
@@ -129,11 +140,11 @@ class PersonDetailActivity : AppCompatActivity(), PhoneAdapter.OnPhoneClickListe
         private const val PARAM_ID = "id"
     }
 
-    override fun onPhoneClick(phone: Phone) {
-
+    override fun onPhoneDeleteClick(phone: Phone) {
+        viewModel.deletePhone(this, phone)
     }
 
-    class PhoneDialogFragment(val viewModel: PersonDetailViewModel) : DialogFragment() {
+    class PhoneDialogFragment(private val viewModel: PersonDetailViewModel) : DialogFragment() {
 
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -144,21 +155,19 @@ class PersonDetailActivity : AppCompatActivity(), PhoneAdapter.OnPhoneClickListe
                     // Add action buttons.
                     .setPositiveButton(
                         "OK"
-                    ) { dialog, id ->
-                        val dialog  = dialog as AlertDialog
-                        val txtPhoneNumber = dialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.txtPhoneNumber)
+                    ) { dialog, _ ->
+                        val alertDialog = dialog as AlertDialog
+                        val txtPhoneNumber = alertDialog.findViewById<EditText>(R.id.txtPhoneNumber)
                         val phoneNumber = txtPhoneNumber?.text.toString()
 
-                        val phoneTypeSpinner = dialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.spPhoneType)
-                        val phoneType = phoneTypeSpinner?.text.toString()
-                        viewModel.savePhone(phoneNumber, phoneType)
-
-
+                        val phoneTypeSpinner = alertDialog.findViewById<Spinner>(R.id.spPhoneType)
+                        val phoneType = phoneTypeSpinner?.selectedItem.toString()
+                        viewModel.savePhone(alertDialog.context, phoneNumber, phoneType)
                     }
                     .setNegativeButton(
                         "Cancel"
-                    ) { dialog, id ->
-                        getDialog()?.cancel()
+                    ) { _, _ ->
+                        dialog?.cancel()
                     }
                 builder.create()
             } ?: throw IllegalStateException("Activity cannot be null")

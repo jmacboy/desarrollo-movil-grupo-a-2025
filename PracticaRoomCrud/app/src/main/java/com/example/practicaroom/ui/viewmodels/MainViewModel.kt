@@ -7,15 +7,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.practicaroom.db.models.Person
+import com.example.practicaroom.db.models.PersonWithPhones
 import com.example.practicaroom.repositories.PersonRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
-    private val _personList: MutableLiveData<List<Person>> = MutableLiveData(mutableListOf())
-    val personList: LiveData<List<Person>> = _personList
+    private val _personList: MutableLiveData<List<PersonWithPhones>> =
+        MutableLiveData(mutableListOf())
+    val personList: LiveData<List<PersonWithPhones>> = _personList
 
-    private val _personDeleted: MutableLiveData<Person> = MutableLiveData(null)
-    val personDeleted: LiveData<Person> = _personDeleted
+    private val _personDeleted: MutableLiveData<PersonWithPhones> = MutableLiveData(null)
+    val personDeleted: LiveData<PersonWithPhones> = _personDeleted
 
     fun loadData(context: Context) {
         viewModelScope.launch {
@@ -23,10 +25,10 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun deletePerson(context: Context, person: Person) {
+    fun deletePerson(context: Context, person: PersonWithPhones) {
         viewModelScope.launch {
-            Log.d("Person", "Deleting person with id ${person.id}")
-            PersonRepository.deletePerson(context, person)
+            Log.d("Person", "Deleting person with id ${person.person.id}")
+            PersonRepository.deletePerson(context, person.person)
             _personDeleted.postValue(person)
         }
     }

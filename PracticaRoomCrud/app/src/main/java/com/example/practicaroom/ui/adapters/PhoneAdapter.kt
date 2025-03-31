@@ -65,14 +65,13 @@ class PhoneAdapter(
         fun bind(item: Phone, listener: OnPhoneClickListener?) {
             binding.lblPhoneText.text = item.number
             binding.lblPhoneType.text = item.type
-            binding.root.setOnClickListener {
-                listener?.onPhoneClick(item)
+            binding.btnPhoneDelete.setOnClickListener {
+                listener?.onPhoneDeleteClick(item)
             }
-
         }
     }
 
     interface OnPhoneClickListener {
-        fun onPhoneClick(phone: Phone)
+        fun onPhoneDeleteClick(phone: Phone)
     }
 }
