@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.practicaroom.db.models.Person
 import com.example.practicaroom.db.models.PersonWithPhones
 import com.example.practicaroom.repositories.PersonRepository
 import kotlinx.coroutines.launch
